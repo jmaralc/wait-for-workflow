@@ -31,7 +31,7 @@ def get_headers(config: Config) -> dict:
 
 
 def dispatch_workflow(config: Config) -> None:
-    default_branch = "main"
+    default_branch = "master"
     data = {"ref": default_branch}
     dispatch_uri = (
         f'{config.github_api_path}/'

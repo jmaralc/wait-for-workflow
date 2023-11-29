@@ -11,7 +11,7 @@ jobs:
         # Put your action repo here
         uses: jmaralc/wait-for-workflow@master
         with:
-          githubToken: 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
+          githubToken: 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
           workspace: jmaralc
           repository: wait-for-workflow
           workflow: python
