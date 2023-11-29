@@ -1,13 +1,19 @@
-name: "Python Container Action Template"
-description: "Get started with Python Container actions"
-author: "Jacob Tomlinson"
+name: "Wait for a workflow"
+description: "It waits for a workflow in a different repository to be executed and return the value"
+author: "Javier Martinez Alcantara, JM"
 inputs:
-  myInput:
-    description: "Input to use"
-    default: "world"
-outputs:
-  myOutput:
-    description: "Output from the action"
+  githubToken:
+    description: "User token to be get enough privileges to trigger the workflow in the other repository"
+    required: true
+  workspace:
+    description: "Github workspace where the repository of the workflow to be invoked is"
+    required: true
+  repository:
+    description: "Repository that contains the workflow to be invoked"
+    required: true
+  workflow:
+    description: "Name of the yaml file or workflow name that represents the workflow"
+    required: true
 runs:
   using: "docker"
   image: "Dockerfile"

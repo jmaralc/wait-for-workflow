@@ -5,10 +5,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python 3.7
+      - name: Set up Python 3.12
         uses: actions/setup-python@v1
         with:
-          python-version: "3.7"
+          python-version: "3.12"
 
       - uses: actions/checkout@v1
 
@@ -16,3 +16,7 @@ jobs:
         run: |
           pip install flake8
           flake8 main.py
+
+      - name: Sleep for 3 minutes
+        run: sleep 180s
+        shell: bash

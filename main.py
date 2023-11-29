@@ -1,19 +1,146 @@
 import os
-import requests  # noqa We are just importing this to prove the dependency installed correctly
+import sys
+from time import sleep
+from dataclasses import dataclass
+from typing import TypeAlias
 
-# Set the output value by writing to the outputs in the Environment File, mimicking the behavior defined here:
-#  https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
-def set_github_action_output(output_name, output_value):
-    f = open(os.path.abspath(os.environ["GITHUB_OUTPUT"]), "a")
-    f.write(f'{output_name}={output_value}')
-    f.close()    
+import httpx
+
+
+wf_id: TypeAlias = str
+wf_conclusion: TypeAlias = str
+
+
+@dataclass(frozen=True)
+class Config:
+    github_token: str
+    workspace: str
+    repository: str
+    workflow: str
+    github_api_path: str = "https://api.github.com/repos"
+    github_default_workflows_path: str = "actions/workflows"
+    github_default_runs_path: str = "actions/runs"
+
+
+def get_headers(config: Config) -> dict:
+    return {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': f'Bearer {config.github_token}',
+        'Content-Type': 'application/json'
+    }
+
+
+def dispatch_workflow(config: Config) -> None:
+    default_branch = "main"
+    data = {"ref": default_branch}
+    dispatch_uri = (
+        f'{config.github_api_path}/'
+        f'{config.workspace}/'
+        f'{config.repository}/'
+        f'{config.github_default_workflows_path}/'
+        f'{config.workflow}/'
+        f'dispatches'
+    )
+
+    r = httpx.post(
+        dispatch_uri,
+        json=data,
+        headers=get_headers(config)
+    )
+
+    if r.is_error:
+        raise Exception()
+
+
+def disable_workflow(config: Config) -> None:
+    disable_uri = (
+        f'{config.github_api_path}/'
+        f'{config.workspace}/'
+        f'{config.repository}/'
+        f'{config.github_default_workflows_path}/'
+        f'{config.workflow}/'
+        f'disable'
+    )
+    r = httpx.put(
+        disable_uri,
+        headers=get_headers(config)
+    )
+
+    if r.is_error:
+        raise Exception()
+
+
+def get_running_workflow_id(config: Config) -> wf_id:
+    params = {'status': 'in_progress'}
+    get_runs_uri = (
+        f'{config.github_api_path}/'
+        f'{config.workspace}/'
+        f'{config.repository}/'
+        f'{config.github_default_runs_path}'
+    )
+
+    r = httpx.get(
+        get_runs_uri,
+        params=params,
+        headers=get_headers(config)
+    )
+
+    if r.is_error:
+        raise Exception()
+
+    data = r.json()
+
+    if data.get("total_count") != 1:
+        raise Exception()
+
+    return data.get("workflow_runs").pop().get("id")
+
+
+def get_workflow_conclusion_when_complete(
+        workflow_id: wf_id,
+        config: Config,
+        sleeping_seconds: int = 10
+) -> wf_conclusion:
+    get_run_uri = (
+        f'{config.github_api_path}/'
+        f'{config.workspace}/'
+        f'{config.repository}/'
+        f'{config.github_default_runs_path}/'
+        f'{workflow_id}'
+    )
+
+    data = {}
+
+    while data.get("status") != "completed":
+        sleep(sleeping_seconds)
+        r = httpx.get(
+            get_run_uri,
+            headers=get_headers(config)
+        )
+        if r.is_error:
+            raise Exception()
+        data = r.json()
+
+    return data.get("conclusion", "failure")
+
 
 def main():
-    my_input = os.environ["INPUT_MYINPUT"]
+    conf = Config(
+        github_token=os.environ["INPUT_GITHUBTOKEN"],
+        workspace=os.environ["INPUT_WORKSPACE"],
+        repository=os.environ["INPUT_REPOSITORY"],
+        workflow=os.environ["INPUT_WORKFLOW"],
+    )
 
-    my_output = f'Hello {my_input}'
+    dispatch_workflow(conf)
+    disable_workflow(conf)
+    workflow_id = get_running_workflow_id(conf)
+    conclusion = get_workflow_conclusion_when_complete(workflow_id, conf)
 
-    set_github_action_output('myOutput', my_output)
+    if conclusion == "failure":
+        sys.exit(13)
+
+    sys.exit()
 
 
 if __name__ == "__main__":
