@@ -16,4 +16,4 @@ jobs:
           githubToken:  ${{ secrets.GITHUB_TOKEN }}
           workspace: jmaralc
           repository: wait-for-workflow
-          workflow: python
+          workflow: python.yml
