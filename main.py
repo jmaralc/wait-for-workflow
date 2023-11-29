@@ -4,7 +4,6 @@ from time import sleep
 from dataclasses import dataclass
 from typing import AnyStr
 
-
 import httpx
 
 
@@ -50,7 +49,7 @@ def dispatch_workflow(config: Config) -> None:
     )
 
     if r.is_error:
-        raise Exception()
+        raise Exception(f"{r.content}")
 
 
 def disable_workflow(config: Config) -> None:
@@ -68,7 +67,7 @@ def disable_workflow(config: Config) -> None:
     )
 
     if r.is_error:
-        raise Exception()
+        raise Exception(f"{r.content}")
 
 
 def get_running_workflow_id(config: Config) -> wf_id:
@@ -87,7 +86,7 @@ def get_running_workflow_id(config: Config) -> wf_id:
     )
 
     if r.is_error:
-        raise Exception()
+        raise Exception(f"{r.content}")
 
     data = r.json()
 
@@ -119,7 +118,7 @@ def get_workflow_conclusion_when_complete(
             headers=get_headers(config)
         )
         if r.is_error:
-            raise Exception()
+            raise Exception(f"{r.content}")
         data = r.json()
 
     return data.get("conclusion", "failure")
