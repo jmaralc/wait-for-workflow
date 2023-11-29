@@ -92,6 +92,8 @@ def get_running_workflow_id(config: Config) -> wf_id:
 
     data = r.json()
 
+    print(f"Running workflow data:{data}")
+
     if data.get("total_count") != 1:
         raise Exception()
 
@@ -135,7 +137,8 @@ def main():
     )
 
     dispatch_workflow(conf)
-    disable_workflow(conf)
+    # disable_workflow(conf)
+    sleep(10)
     workflow_id = get_running_workflow_id(conf)
     conclusion = get_workflow_conclusion_when_complete(workflow_id, conf)
 
