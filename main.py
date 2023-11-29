@@ -42,6 +42,8 @@ def dispatch_workflow(config: Config) -> None:
         f'dispatches'
     )
 
+    print(f"dispatch url:{dispatch_uri}")
+
     r = httpx.post(
         dispatch_uri,
         json=data,
