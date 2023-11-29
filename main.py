@@ -94,7 +94,10 @@ def get_running_workflow_id(config: Config) -> wf_id:
 
     print(f"Running workflow data:{data}")
 
-    if data.get("total_count") != 1:
+    runs = data.get("workflow_runs")
+    related_runs = list(filter(lambda workflow: config.workflow in workflow.get("path"), runs))
+
+    if len(related_runs) != 1:
         raise Exception()
 
     return data.get("workflow_runs").pop().get("id")
