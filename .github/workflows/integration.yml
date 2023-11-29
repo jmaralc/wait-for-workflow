@@ -1,5 +1,6 @@
 name: Integration Test
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,7 +12,7 @@ jobs:
         # Put your action repo here
         uses: jmaralc/wait-for-workflow@master
         with:
-          githubToken: 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
+          githubToken:  ${{ secrets.GITHUB_TOKEN }}
           workspace: jmaralc
           repository: wait-for-workflow
           workflow: python
