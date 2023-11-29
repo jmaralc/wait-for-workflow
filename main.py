@@ -2,13 +2,14 @@ import os
 import sys
 from time import sleep
 from dataclasses import dataclass
-from typing import TypeAlias
+from typing import AnyStr
+
 
 import httpx
 
 
-wf_id: TypeAlias = str
-wf_conclusion: TypeAlias = str
+wf_id = AnyStr
+wf_conclusion = AnyStr
 
 
 @dataclass(frozen=True)
