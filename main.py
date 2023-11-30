@@ -97,6 +97,8 @@ def get_running_workflow_id(config: Config) -> wf_id:
     runs = data.get("workflow_runs")
     related_runs = list(filter(lambda workflow: config.workflow in workflow.get("path"), runs))
 
+    print(f"Related runs data:{related_runs}")
+
     if len(related_runs) != 1:
         raise Exception()
 
@@ -117,8 +119,9 @@ def get_workflow_conclusion_when_complete(
     )
 
     data = {}
-
+    print(f"Start polling workflow")
     while data.get("status") != "completed":
+        print(f"Sleeping for {sleeping_seconds}")
         sleep(sleeping_seconds)
         r = httpx.get(
             get_run_uri,
