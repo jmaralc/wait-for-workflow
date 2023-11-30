@@ -114,6 +114,7 @@ def get_workflow_conclusion_when_complete(
         config: Config,
         sleeping_seconds: int = 10
 ) -> wf_conclusion:
+    print(f"Checking workflow: {workflow_id}")
     get_run_uri = (
         f'{config.github_api_path}/'
         f'{config.workspace}/'
@@ -125,6 +126,7 @@ def get_workflow_conclusion_when_complete(
     data = {}
     print(f"Start polling workflow")
     while data.get("status") != "completed":
+        print(f"Data: {data}")
         print(f"Sleeping for {sleeping_seconds}")
         sleep(sleeping_seconds)
         r = httpx.get(
