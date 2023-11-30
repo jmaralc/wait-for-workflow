@@ -98,7 +98,10 @@ def get_running_workflow_id(config: Config) -> wf_id:
         print(f"Running workflow data:{data}")
 
         runs = data.get("workflow_runs")
-        related_runs = list(filter(lambda workflow: config.workflow in workflow.get("path"), runs))
+        related_runs = list(filter(
+            lambda workflow: config.workflow in workflow.get("path"),
+            runs
+        ))
         sleep(10)
 
     print(f"Related runs data:{related_runs}")
@@ -124,7 +127,7 @@ def get_workflow_conclusion_when_complete(
     )
 
     data = {}
-    print(f"Start polling workflow")
+    print("Start polling workflow")
     while data.get("status") != "completed":
         print(f"Data: {data}")
         print(f"Sleeping for {sleeping_seconds}")
