@@ -106,7 +106,7 @@ def get_running_workflow_id(config: Config) -> wf_id:
     if len(related_runs) != 1:
         raise Exception()
 
-    return data.get("workflow_runs").pop().get("id")
+    return related_runs.pop().get("id")
 
 
 def get_workflow_conclusion_when_complete(
