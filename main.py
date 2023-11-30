@@ -144,7 +144,7 @@ def main():
 
     dispatch_workflow(conf)
     # disable_workflow(conf)
-    sleep(10)
+    sleep(5)
     workflow_id = get_running_workflow_id(conf)
     conclusion = get_workflow_conclusion_when_complete(workflow_id, conf)
 
