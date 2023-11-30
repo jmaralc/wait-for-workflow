@@ -74,28 +74,32 @@ def disable_workflow(config: Config) -> None:
 
 def get_running_workflow_id(config: Config) -> wf_id:
     params = {'status': 'in_progress'}
-    get_runs_uri = (
-        f'{config.github_api_path}/'
-        f'{config.workspace}/'
-        f'{config.repository}/'
-        f'{config.github_default_runs_path}'
-    )
+    related_runs = []
 
-    r = httpx.get(
-        get_runs_uri,
-        params=params,
-        headers=get_headers(config)
-    )
+    while not related_runs:
+        get_runs_uri = (
+            f'{config.github_api_path}/'
+            f'{config.workspace}/'
+            f'{config.repository}/'
+            f'{config.github_default_runs_path}'
+        )
 
-    if r.is_error:
-        raise Exception(f"{r.content}")
+        r = httpx.get(
+            get_runs_uri,
+            params=params,
+            headers=get_headers(config)
+        )
 
-    data = r.json()
+        if r.is_error:
+            raise Exception(f"{r.content}")
 
-    print(f"Running workflow data:{data}")
+        data = r.json()
 
-    runs = data.get("workflow_runs")
-    related_runs = list(filter(lambda workflow: config.workflow in workflow.get("path"), runs))
+        print(f"Running workflow data:{data}")
+
+        runs = data.get("workflow_runs")
+        related_runs = list(filter(lambda workflow: config.workflow in workflow.get("path"), runs))
+        sleep(10)
 
     print(f"Related runs data:{related_runs}")
 
@@ -144,7 +148,6 @@ def main():
 
     dispatch_workflow(conf)
     # disable_workflow(conf)
-    sleep(5)
     workflow_id = get_running_workflow_id(conf)
     conclusion = get_workflow_conclusion_when_complete(workflow_id, conf)
 
